@@ -1,0 +1,413 @@
+{
+  "name": "PolicyGuard AI- Governance Gate V1",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "ai-governance-request",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "a38eb314-8946-454d-a149-304346b6dffa",
+      "name": "Webhook",
+      "webhookId": "38339633-d5c8-437d-a9ba-03a5cf15b4be"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "8668c4f3-42d9-48d7-8e5d-dc82e869d8a3",
+              "leftValue": "={{ $json.body.contains_credentials }}",
+              "rightValue": "0",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        224,
+        0
+      ],
+      "id": "94a06728-190d-4169-8426-60b4477323a4",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "922424dc-e0db-427f-9558-49d7c617f22c",
+              "name": "decision",
+              "value": "BLOCKED",
+              "type": "string"
+            },
+            {
+              "id": "4e27278a-2f2a-420e-8e29-20ed26f3f7dc",
+              "name": "risk_level",
+              "value": "HIGH",
+              "type": "string"
+            },
+            {
+              "id": "cb496181-682d-4cdf-95b0-cc6463f63c20",
+              "name": "policy",
+              "value": "Secrets and Credentials Policy",
+              "type": "string"
+            },
+            {
+              "id": "844529b3-40ba-462e-8c56-c01bd9560bf3",
+              "name": "reason",
+              "value": "Credentials, passwords, API keys or secrets must not be processed through AI tools.",
+              "type": "string"
+            },
+            {
+              "id": "9f8abd3c-38f7-4573-b320-0fba66661dcf",
+              "name": "requires_human_review",
+              "value": "false",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        448,
+        -96
+      ],
+      "id": "e88948ee-8def-4403-8464-358e1191bad0",
+      "name": "Block - Credentials Detected"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "304f8721-d331-4fc6-93d9-aa9632ebd50e",
+              "leftValue": "={{ $json.body.contains_personal_data}}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "2c61af69-352e-48c4-8295-ef341c96cd09",
+              "leftValue": "={{ $json.body.external_ai }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        448,
+        96
+      ],
+      "id": "49bd68de-0c70-4244-b457-3e18da2957a2",
+      "name": "personal data+excternal ai"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "2b4e1d7e-a3e4-41c5-a04f-534709faa15a",
+              "name": "=request_id {{ $json.body.request_id }}",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "8f5af1c7-1eb0-45d5-b1fd-3dbfa8546c8a",
+              "name": "decision",
+              "value": "HUMAN_REVIEW",
+              "type": "string"
+            },
+            {
+              "id": "8efd8d48-ff5f-4f30-a8fa-57fca2dad137",
+              "name": "risk_level",
+              "value": "MEDIUM",
+              "type": "string"
+            },
+            {
+              "id": "78b4173a-4d60-404c-9d87-9b0460a8793b",
+              "name": "policy",
+              "value": "Personal Data & External AI Policy",
+              "type": "string"
+            },
+            {
+              "id": "d2d77731-6a9e-4e81-9af7-30105c346eed",
+              "name": "reason",
+              "value": "Personal data is being processed by an external AI tool and requires governance review.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        672,
+        0
+      ],
+      "id": "8f327941-cc4d-4ea5-bea5-beaa8aa07e3e",
+      "name": "Human Review - Personal Data"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "bfb687c4-23e8-495c-8a38-bf417561aaf9",
+              "leftValue": "={{ $json.body.approved_tool }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        672,
+        192
+      ],
+      "id": "baec4eba-445f-416e-ac69-b9698221b35d",
+      "name": "Check Approved AI Tool"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7ef17ff7-b6e1-4fe5-8829-4adacfa1f2b8",
+              "name": "=request_id\n{{ $json.body.request_id }}",
+              "value": "=",
+              "type": "string"
+            },
+            {
+              "id": "b225fbf4-c084-4b42-ac79-9cf1ace447af",
+              "name": "decision",
+              "value": "APPROVED",
+              "type": "string"
+            },
+            {
+              "id": "a7d4ea72-76de-4b69-b132-77d3dcc92474",
+              "name": "risk_level",
+              "value": "LOW",
+              "type": "string"
+            },
+            {
+              "id": "239f3db7-8739-4940-ba8d-b2fb40bc8270",
+              "name": "policy",
+              "value": "Approved AI Usage Policy",
+              "type": "string"
+            },
+            {
+              "id": "75d5719c-ccd7-4d7b-80c1-6c60d085e040",
+              "name": "reason",
+              "value": "The request uses an approved AI tool and no higher-risk policy condition was triggered.",
+              "type": "string"
+            },
+            {
+              "id": "da9ff06b-e13d-4e8f-820a-8f0739023a05",
+              "name": "requires_human_review",
+              "value": "false",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        896,
+        96
+      ],
+      "id": "5ab20372-0475-4fab-bf03-5ff9da5ab067",
+      "name": "Approve AI Request"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7d203089-77dd-4c23-b06a-52236e8615ad",
+              "name": "=request_id\n{{ $json.body.request_id }}",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "710464dc-319e-493e-a4cc-fc0d49c23e12",
+              "name": "decision",
+              "value": "HUMAN_REVIEW",
+              "type": "string"
+            },
+            {
+              "id": "58ee47ec-7a36-45bd-9384-e7373fed46b4",
+              "name": "risk_level",
+              "value": "MEDIUM",
+              "type": "string"
+            },
+            {
+              "id": "969f4f1c-a9fa-4220-9ab2-00716c78f7b5",
+              "name": "policy",
+              "value": "Approved AI Tools Policy",
+              "type": "string"
+            },
+            {
+              "id": "1b73a84b-e3ee-43c4-94ee-dc59ef0a0460",
+              "name": "reason",
+              "value": "The requested AI tool is not currently approved for company use and requires governance review.",
+              "type": "string"
+            },
+            {
+              "id": "23b8d10d-5717-40e2-929e-7b25e902011c",
+              "name": "requires_human_review",
+              "value": "true",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        896,
+        288
+      ],
+      "id": "7509c03f-229a-4928-a6b1-0e7672a8233d",
+      "name": "Human Review - Unapproved Tool"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Block - Credentials Detected",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "personal data+excternal ai",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "personal data+excternal ai": {
+      "main": [
+        [
+          {
+            "node": "Human Review - Personal Data",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Check Approved AI Tool",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Approved AI Tool": {
+      "main": [
+        [
+          {
+            "node": "Approve AI Request",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Human Review - Unapproved Tool",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "a99100e9-13b8-431a-8ef8-8f079d8388dc",
+  "meta": {
+    "instanceId": "59dfae6ef7a146b76cdd290157587e49130d5503605044a2b1aff02fa589b2a2"
+  },
+  "nodeGroups": [],
+  "id": "YibU2UPhjVkgmlAp",
+  "tags": []
+}
