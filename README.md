@@ -1,12 +1,12 @@
-\# PolicyGuard AI — n8n Governance Gate V1
+PolicyGuard AI — n8n Governance Gate V1
 
 
 
-A simple \*\*rules-first AI governance workflow\*\* built with n8n to review employee AI-use requests.
+A simple rules-first AI governance workflow built with n8n to review employee AI-use requests.
 
 
 
-\## V1 Logic
+ V1 Logic
 
 
 
@@ -42,7 +42,7 @@ Check Approved AI Tool
 
 
 
-\## Decisions
+ Decisions
 
 
 
